@@ -97,18 +97,18 @@ int main() {
 
 	while(1) {
 		if(displayFlag) {
-			lcd_clear();
-			lcd_print("Greetings from", 0);
-			lcd_print("Alan and Chris", 1);
+			//LCD_clear();
+			LCD_print("Greetings from", 0);
+			LCD_print("Alan and Chris", 1);
 		}
 		else {
-			lcd_clear();
-			lcd_print("Hello World", 0);
-			lcd_print("Assignment 3", 1);
+			//LCD_clear();
+			LCD_print("Hello World", 0);
+			LCD_print("Assignment 3", 1);
 		}
 
 		displayFlag ^= 1;
-		HAL_DELAY(DISPLAY_DELAY);
+		//HAL_DELAY(DISPLAY_DELAY);
 	}
 
 	return 0;
