@@ -14,12 +14,13 @@ Class: 		CPE-3160
 #include "stm32l4xx_hal_gpio.h"
 #include <stdint.h>
 
-
 #define INSTRUCTION_DISPLAY_CLEAR 0b1
 #define INSTRUCTION_CURSOR_HOME 0b10
 #define INSTRUCTION_ENTRY_MODE_SET 0b100
 #define INSTRUCTION_DISPLAY_OFF 0b1000
 #define INSTRUCTION_CURSOR_SHIFT 0b10000
+
+#define DISPLAY_DELAY 3000
 
 
 /* PC1-8 = DB0-7 */
@@ -64,6 +65,25 @@ void gpio_init() {
 
 int main() {
 	gpio_init();
-	
+	LCD_init();
+
+	int displayFlag = 0;
+
+	while(1) {
+		if(displayFlag) {
+			lcd_clear();
+			lcd_print("Greetings from", 0);
+			lcd_print("Alan and Chris", 1);
+		}
+		else {
+			lcd_clear();
+			lcd_print("Hello World", 0);
+			lcd_print("Assignment 3", 1);
+		}
+
+		displayFlag ^= 1;
+		HAL_DELAY(DISPLAY_DELAY);
+	}
+
 	return 0;
 }
