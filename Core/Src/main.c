@@ -14,41 +14,64 @@ Class: 		CPE-3160
 #include "stm32l4xx_hal_gpio.h"
 #include <stdint.h>
 
-#define INSTRUCTION_DISPLAY_CLEAR 0b1
-#define INSTRUCTION_CURSOR_HOME 0b10
-#define INSTRUCTION_ENTRY_MODE_SET 0b100
-#define INSTRUCTION_DISPLAY_OFF 0b1000
-#define INSTRUCTION_CURSOR_SHIFT 0b10000
+#define INSTRUCTION_DISPLAY_CLEAR_Pos 0
+#define INSTRUCTION_CURSOR_HOME_Pos 1
+#define INSTRUCTION_ENTRY_MODE_SET_Pos 2
+#define INSTRUCTION_DISPLAY_OFF_Pos 3
+#define INSTRUCTION_CURSOR_SHIFT_Pos 4
+#define INSTRUCTION_FUNCTION_SET_Pos 5
 
 #define DISPLAY_DELAY 3000
 
-
 /* PC1-8 = DB0-7 */
-void DB_set(uint8_t val) {
+void DB_set(uint8_t val)
+{
 	GPIOC->ODR &= ~(0b11111111 << GPIO_ODR_OD1_Pos);
 	GPIOC->ODR |= (val << GPIO_ODR_OD1_Pos);
 }
 
-void RS_set(bool val) {
+void RS_set(bool val)
+{
 	GPIOC->ODR &= ~GPIO_ODR_OD0_Msk;
 	GPIOC->ODR |= (val << GPIO_ODR_OD0_Pos);
 }
 
-void send_instruction(uint8_t val) {
+void instruction_send(uint8_t val)
+{
 	RS_set(false);
 	DB_set(val);
 }
 
-void send_data(uint8_t val) {
+void data_send(uint8_t val)
+{
 	RS_set(true);
 	DB_set(val);
 }
 
-void bus_init() {
+uint8_t instruction_mask_create(uint8_t offset, uint8_t argument_count, bool *arguments)
+{
+	uint8_t mask = 0;
+	mask |= (1 << offset);
+
+	for (uint8_t i = 0; i < argument_count; i++) {
+		uint8_t argument_offset = offset - 1 - i;
+		mask |= (arguments[i] << argument_offset);
+	}
+
+	return mask;
+}
+
+void entry_mode_set(bool increment, bool display_shift_on)
+{
+}
+
+void bus_init()
+{
 	RCC->AHB2ENR |= (RCC_AHB2ENR_GPIOAEN | RCC_AHB2ENR_GPIOCEN);
 }
 
-void gpio_init() {
+void gpio_init()
+{
 	bus_init();
 
 	//Set PC0-9 as input mode
@@ -63,19 +86,19 @@ void gpio_init() {
 	return;
 }
 
-int main() {
+int main()
+{
 	gpio_init();
 	LCD_init();
 
 	int displayFlag = 0;
 
-	while(1) {
-		if(displayFlag) {
+	while (1) {
+		if (displayFlag) {
 			lcd_clear();
 			lcd_print("Greetings from", 0);
 			lcd_print("Alan and Chris", 1);
-		}
-		else {
+		} else {
 			lcd_clear();
 			lcd_print("Hello World", 0);
 			lcd_print("Assignment 3", 1);
