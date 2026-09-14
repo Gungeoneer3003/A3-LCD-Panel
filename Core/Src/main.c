@@ -14,6 +14,14 @@ Class: 		CPE-3160
 #include "stm32l4xx_hal_gpio.h"
 #include <stdint.h>
 
+
+#define INSTRUCTION_DISPLAY_CLEAR 0b1
+#define INSTRUCTION_CURSOR_HOME 0b10
+#define INSTRUCTION_ENTRY_MODE_SET 0b100
+#define INSTRUCTION_DISPLAY_OFF 0b1000
+#define INSTRUCTION_CURSOR_SHIFT 0b10000
+
+
 /* PC1-8 = DB0-7 */
 void DB_set(uint8_t val) {
 	GPIOC->ODR &= ~(0b11111111 << GPIO_ODR_OD1_Pos);
