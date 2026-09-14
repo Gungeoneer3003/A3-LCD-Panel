@@ -14,6 +14,9 @@ Class: 		CPE-3160
 #include "stm32l4xx_hal_gpio.h"
 #include <stdint.h>
 
+#define DISPLAY_DELAY 3000
+
+
 /* PC1-8 = DB0-7 */
 void DB_set(uint8_t command) {
 	GPIOC->ODR &= ~(0b11111111 << GPIO_ODR_OD1_Pos);
@@ -46,6 +49,25 @@ void gpio_init() {
 
 int main() {
 	gpio_init();
-	
+	LCD_init();
+
+	int displayFlag = 0;
+
+	while(1) {
+		if(displayFlag) {
+			lcd_clear();
+			lcd_print("Greetings from", 0);
+			lcd_print("Alan and Chris", 1);
+		}
+		else {
+			lcd_clear();
+			lcd_print("Hello World", 0);
+			lcd_print("Assignment 3", 1);
+		}
+
+		displayFlag ^= 1;
+		HAL_DELAY(DISPLAY_DELAY);
+	}
+
 	return 0;
 }
