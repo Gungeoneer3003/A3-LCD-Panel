@@ -11,6 +11,7 @@ Class: 		CPE-3160
 #include "stdbool.h"
 #include "stm32l476xx.h"
 #include "stm32l4xx_hal.h"
+#include "stm32l4xx_hal_dma.h"
 #include "stm32l4xx_hal_gpio.h"
 #include <stdint.h>
 #include <string.h> // For strlen();
@@ -21,6 +22,13 @@ Class: 		CPE-3160
 #define INSTRUCTION_DISPLAY_OFF_Pos 3
 #define INSTRUCTION_CURSOR_SHIFT_Pos 4
 #define INSTRUCTION_FUNCTION_SET_Pos 5
+
+#define INSTRUCTION_DISPLAY_CLEAR_Msk (1 << INSTRUCTION_DISPLAY_CLEAR_Pos )
+#define INSTRUCTION_CURSOR_HOME_Msk (1 << INSTRUCTION_CURSOR_HOME_Pos   )
+#define INSTRUCTION_ENTRY_MODE_SET_Msk (1 << INSTRUCTION_ENTRY_MODE_SET_Pos) 
+#define INSTRUCTION_DISPLAY_OFF_Msk (1 << INSTRUCTION_DISPLAY_OFF_Pos   )
+#define INSTRUCTION_CURSOR_SHIFT_Msk (1 << INSTRUCTION_CURSOR_SHIFT_Pos  )
+#define INSTRUCTION_FUNCTION_SET_Msk (1 << INSTRUCTION_FUNCTION_SET_Pos  )
 
 #define DISPLAY_DELAY 3000
 
@@ -62,10 +70,25 @@ uint8_t instruction_mask_create(uint8_t offset, uint8_t argument_count, bool *ar
 	return mask;
 }
 
-void entry_mode_set(bool increment, bool display_shift_on)
-{
+void display_clear() {
+	instruction_send(INSTRUCTION_DISPLAY_CLEAR_Msk);	
 }
 
+void entry_mode_set(bool increment, bool display_shift_on)
+{
+	static const uint8_t argument_count = 2;
+	bool arguments[argument_count];	
+
+	arguments[0] = increment;
+	arguments[1] = display_shift_on;
+
+	uint8_t mask = instruction_mask_create(INSTRUCTION_ENTRY_MODE_SET_Pos, argument_count, arguments);
+
+	instruction_send(mask);	
+}
+
+void display_on_off() {
+}
 
 // TODO: need to have display ON/OFF configured
 void LCD_write_char(uint8_t letter) {
