@@ -1,8 +1,8 @@
 /*
-Assignment:	A2
+Assignment:	A3
 Names: 		Chris Amey & Alan Kusparmakov
 Professor: 	Dr. John Oliver 
-Date: 		September 9th, 2026
+Date: 		September 13th, 2026
 Class: 		CPE-3160
 */
 
@@ -14,11 +14,27 @@ Class: 		CPE-3160
 #include "stm32l4xx_hal_gpio.h"
 #include <stdint.h>
 
+void bus_init() {
+	RCC->AHB2ENR |= (RCC_AHB2ENR_GPIOAEN | RCC_AHB2ENR_GPIOCEN);
+}
+
 void gpio_init() {
+	bus_init();
+
+	//Set PC0-9 as input mode
+	GPIOC->MODER &= ~(GPIO_MODER_MODE0 | GPIO_MODER_MODE1 | GPIO_MODER_MODE2 | GPIO_MODER_MODE3);
+	GPIOC->MODER &= ~(GPIO_MODER_MODE4 | GPIO_MODER_MODE5 | GPIO_MODER_MODE6);
+	GPIOC->MODER &= ~(GPIO_MODER_MODE7 | GPIO_MODER_MODE8 | GPIO_MODER_MODE9);
+
+	GPIOC->MODER |= (GPIO_MODER_MODE0_0 | GPIO_MODER_MODE1_0 | GPIO_MODER_MODE2_0 | GPIO_MODER_MODE3_0);
+	GPIOC->MODER |= (GPIO_MODER_MODE4_0 | GPIO_MODER_MODE5_0 | GPIO_MODER_MODE6_0);
+	GPIOC->MODER |= (GPIO_MODER_MODE7_0 | GPIO_MODER_MODE8_0 | GPIO_MODER_MODE9_0);
+
 	return;
 }
 
 int main() {
+	gpio_init();
 	
 
 	return 0;
