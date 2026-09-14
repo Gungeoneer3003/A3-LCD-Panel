@@ -18,14 +18,24 @@ Class: 		CPE-3160
 
 
 /* PC1-8 = DB0-7 */
-void DB_set(uint8_t command) {
+void DB_set(uint8_t val) {
 	GPIOC->ODR &= ~(0b11111111 << GPIO_ODR_OD1_Pos);
-	GPIOC->ODR |= (command << GPIO_ODR_OD1_Pos);
+	GPIOC->ODR |= (val << GPIO_ODR_OD1_Pos);
 }
 
 void RS_set(bool val) {
 	GPIOC->ODR &= ~GPIO_ODR_OD0_Msk;
 	GPIOC->ODR |= (val << GPIO_ODR_OD0_Pos);
+}
+
+void send_instruction(uint8_t val) {
+	RS_set(false);
+	DB_set(val);
+}
+
+void send_data(uint8_t val) {
+	RS_set(true);
+	DB_set(val);
 }
 
 void bus_init() {
