@@ -13,6 +13,7 @@ Class: 		CPE-3160
 #include "stm32l4xx_hal.h"
 #include "stm32l4xx_hal_gpio.h"
 #include <stdint.h>
+#include <string.h> // For strlen();
 
 #define INSTRUCTION_DISPLAY_CLEAR 0b1
 #define INSTRUCTION_CURSOR_HOME 0b10
@@ -44,6 +45,26 @@ void send_data(uint8_t val) {
 	DB_set(val);
 }
 
+void LCD_write_char(uint8_t letter) {
+	send_data(letter);
+}
+
+
+void LCD_print(const char* message, uint8_t line) {
+	// Check if the string can fit in the line
+	size_t length = strlen(message);
+	if (length > 20) {
+		LCD_print("BAD STR", line);
+		return;
+	}
+
+	for(int i = 0; i < length; i++) {
+		LCD_write_char(message[i]);
+	}
+
+	return;
+}
+
 void bus_init() {
 	RCC->AHB2ENR |= (RCC_AHB2ENR_GPIOAEN | RCC_AHB2ENR_GPIOCEN);
 }
@@ -65,9 +86,14 @@ void gpio_init() {
 
 int main() {
 	gpio_init();
-	LCD_init();
+	//LCD_init();
 
 	int displayFlag = 0;
+
+	LCD_print("m", 1);
+	return 0;
+
+
 
 	while(1) {
 		if(displayFlag) {
