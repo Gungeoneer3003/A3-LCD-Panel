@@ -19,14 +19,14 @@ Class: 		CPE-3160
 #define INSTRUCTION_DISPLAY_CLEAR_Pos 0
 #define INSTRUCTION_CURSOR_HOME_Pos 1
 #define INSTRUCTION_ENTRY_MODE_SET_Pos 2
-#define INSTRUCTION_DISPLAY_OFF_Pos 3
+#define INSTRUCTION_DISPLAY_ON_OFF_Pos 3
 #define INSTRUCTION_CURSOR_SHIFT_Pos 4
 #define INSTRUCTION_FUNCTION_SET_Pos 5
 
 #define INSTRUCTION_DISPLAY_CLEAR_Msk (1 << INSTRUCTION_DISPLAY_CLEAR_Pos )
 #define INSTRUCTION_CURSOR_HOME_Msk (1 << INSTRUCTION_CURSOR_HOME_Pos   )
 #define INSTRUCTION_ENTRY_MODE_SET_Msk (1 << INSTRUCTION_ENTRY_MODE_SET_Pos) 
-#define INSTRUCTION_DISPLAY_OFF_Msk (1 << INSTRUCTION_DISPLAY_OFF_Pos   )
+#define INSTRUCTION_DISPLAY_ON_OFF_Msk (1 << INSTRUCTION_DISPLAY_ON_OFF_Pos   )
 #define INSTRUCTION_CURSOR_SHIFT_Msk (1 << INSTRUCTION_CURSOR_SHIFT_Pos  )
 #define INSTRUCTION_FUNCTION_SET_Msk (1 << INSTRUCTION_FUNCTION_SET_Pos  )
 
@@ -87,7 +87,23 @@ void entry_mode_set(bool increment, bool display_shift_on)
 	instruction_send(mask);	
 }
 
-void display_on_off() {
+void display_on_off(bool display_on, bool cursor_on, bool cursor_blink) {
+	static const uint8_t argument_count = 3;
+	bool arguments[argument_count];	
+
+	arguments[0] = display_on;
+	arguments[1] = cursor_on;
+	arguments[2] = cursor_blink;
+
+	uint8_t mask = instruction_mask_create(INSTRUCTION_DISPLAY_ON_OFF_Pos, argument_count, arguments);
+
+	instruction_send(mask);	
+}
+
+void display_cursor_shift(bool shift_display, bool right) {
+}
+
+void function_set(bool byte_mode, bool dual_line, bool font) {
 }
 
 // TODO: need to have display ON/OFF configured
