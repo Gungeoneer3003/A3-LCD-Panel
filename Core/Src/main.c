@@ -240,10 +240,20 @@ int main()
 	gpio_init();
 	display_init(true, false, true, true, true, false);
 
-	LCD_print("Hello World!!!!!", FIRST);
-	LCD_print("Assignment 3", SECOND);
 	// TODO: Achieve 0.7V for the contrast in some way
 
 	while (1) {
+		LCD_print("Greetings from", FIRST);
+		LCD_print("Chris and Alan", SECOND);
+
+		HAL_Delay(2000);
+		display_clear();
+
+		LCD_print("Hello World!!!!!", FIRST);
+		LCD_print("Assignment 3", SECOND);
+
+		HAL_Delay(2000);
+		display_clear();
 	}
+
 }
