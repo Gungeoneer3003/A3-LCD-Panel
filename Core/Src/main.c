@@ -2,8 +2,9 @@
 Assignment:	A3
 Names: 		Chris Amey & Alan Kusparmakov
 Professor: 	Dr. John Oliver 
-Date: 		September 13th, 2026
+Date: 		September 18th, 2026
 Class: 		CPE-3160
+Video Link: 	https://drive.google.com/file/d/1Dyof5X0OYgxnH25cyYK-7HI8WRTvMrMC/view?usp=sharing
 */
 
 #include "main.h"
