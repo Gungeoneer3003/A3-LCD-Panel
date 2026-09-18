@@ -13,8 +13,15 @@ Class: 		CPE-3160
 #include "stm32l4xx_hal.h"
 #include "stm32l4xx_hal_dma.h"
 #include "stm32l4xx_hal_gpio.h"
+#include <stddef.h>
 #include <stdint.h>
 #include <string.h> // For strlen();
+
+
+
+#define DDRAM_ADDRESS_SECOND_LINE 0x40
+#define DDRAM_ADDRESS_FIRST_LINE 0x0
+/* ----------------------------------------------------- */
 
 #define INSTRUCTION_DISPLAY_CLEAR_Pos 0
 #define INSTRUCTION_CURSOR_HOME_Pos 1
@@ -23,12 +30,16 @@ Class: 		CPE-3160
 #define INSTRUCTION_CURSOR_SHIFT_Pos 4
 #define INSTRUCTION_FUNCTION_SET_Pos 5
 
+#define INSTRUCTION_DDRAM_ADDRESS_SET_Pos 7
+
 #define INSTRUCTION_DISPLAY_CLEAR_Msk (1 << INSTRUCTION_DISPLAY_CLEAR_Pos)
 #define INSTRUCTION_CURSOR_HOME_Msk (1 << INSTRUCTION_CURSOR_HOME_Pos)
 #define INSTRUCTION_ENTRY_MODE_SET_Msk (1 << INSTRUCTION_ENTRY_MODE_SET_Pos)
 #define INSTRUCTION_DISPLAY_ON_OFF_Msk (1 << INSTRUCTION_DISPLAY_ON_OFF_Pos)
 #define INSTRUCTION_CURSOR_SHIFT_Msk (1 << INSTRUCTION_CURSOR_SHIFT_Pos)
 #define INSTRUCTION_FUNCTION_SET_Msk (1 << INSTRUCTION_FUNCTION_SET_Pos)
+#define INSTRUCTION_DDRAM_ADDRESS_SET_Msk (1 << INSTRUCTION_DDRAM_ADDRESS_SET_Pos)
+
 
 #define DISPLAY_DELAY 3000
 
@@ -142,21 +153,42 @@ void function_set(bool byte_mode, bool dual_line, bool font)
 	instruction_send(mask);
 }
 
+void ddram_address_set(uint8_t addr) {
+	uint8_t mask = INSTRUCTION_DDRAM_ADDRESS_SET_Msk | addr;
+
+	instruction_send(mask);
+}
+
+void line_set(bool second_line) {
+	if (second_line)
+		ddram_address_set(DDRAM_ADDRESS_SECOND_LINE);
+	else
+		ddram_address_set(DDRAM_ADDRESS_FIRST_LINE);
+}
+
 // TODO: need to have display ON/OFF configured
 void LCD_write_char(uint8_t letter)
 {
 	data_send(letter);
 }
 
-void LCD_print(const char *message, uint8_t line)
-{
-	// Check if the string can fit in the line
-	size_t length = strlen(message);
-	// if (length > 20) {
-	// 	LCD_print("BAD STR", line);
-	// 	return;
-	// }
+enum Line {
+	FIRST,
+	SECOND
+};
 
+void LCD_print(const char *message, enum Line line)
+{
+	size_t length = strlen(message);
+	if (length > 16) {
+		message = "BAD LENGTH";
+	}
+
+	if (line == FIRST)
+	 	line_set(false);
+	else
+		line_set(true);
+	
 	for (int i = 0; i < length; i++) {
 		LCD_write_char(message[i]);
 	}
@@ -207,9 +239,9 @@ int main()
 	gpio_init();
 	display_init(true, false, true, true, true, false);
 
-	LCD_print("dshfsdlkjfhlksjdhdsfsdfF", 0);
+	LCD_print("Hello World!!!!!", FIRST);
+	LCD_print("Assignment 3", SECOND);
 	// TODO: Achieve 0.7V for the contrast in some way
-
 
 	while (1) {
 	}
