@@ -41,26 +41,26 @@ void DB_set(uint8_t val)
 	GPIOC->ODR |= (val << GPIO_ODR_OD1_Pos);
 }
 
-/* PC0 = RS */
+/* PC9 = RS */
 void RS_set(bool val)
 {
-	GPIOC->ODR &= ~GPIO_ODR_OD0_Msk;
-	GPIOC->ODR |= (val << GPIO_ODR_OD0_Pos);
+	GPIOC->ODR &= ~GPIO_ODR_OD9_Msk;
+	GPIOC->ODR |= (val << GPIO_ODR_OD9_Pos);
 }
 
-/* PC9 = E */
+/* PC0 = E */
 void E_set(bool val)
 {
-	GPIOC->ODR &= ~GPIO_ODR_OD9_Msk;
-	GPIOC->ODR |= val << GPIO_ODR_OD9_Pos;
+	GPIOC->ODR &= ~GPIO_ODR_OD0_Msk;
+	GPIOC->ODR |= val << GPIO_ODR_OD0_Pos;
 }
 
 void bus_write(uint8_t val, bool set_RS)
 {
 	E_set(false);
-	HAL_Delay(DELAY_SETUP_TIME);
+	HAL_Delay(1);
 	RS_set(set_RS);
-	HAL_Delay(DELAY_SETUP_TIME);
+	HAL_Delay(1);
 	E_set(true);
 	HAL_Delay(DELAY_SETUP_TIME);
 	DB_set(val);
@@ -137,7 +137,7 @@ void function_set(bool byte_mode, bool dual_line, bool font)
 	arguments[1] = dual_line;
 	arguments[2] = font;
 
-	uint8_t mask = instruction_mask_create(INSTRUCTION_DISPLAY_ON_OFF_Pos, argument_count, arguments);
+	uint8_t mask = instruction_mask_create(INSTRUCTION_FUNCTION_SET_Pos, argument_count, arguments);
 
 	instruction_send(mask);
 }
@@ -152,10 +152,10 @@ void LCD_print(const char *message, uint8_t line)
 {
 	// Check if the string can fit in the line
 	size_t length = strlen(message);
-	if (length > 20) {
-		LCD_print("BAD STR", line);
-		return;
-	}
+	// if (length > 20) {
+	// 	LCD_print("BAD STR", line);
+	// 	return;
+	// }
 
 	for (int i = 0; i < length; i++) {
 		LCD_write_char(message[i]);
@@ -166,17 +166,22 @@ void LCD_print(const char *message, uint8_t line)
 
 void bus_init()
 {
-	RCC->AHB2ENR |= (RCC_AHB2ENR_GPIOAEN | RCC_AHB2ENR_GPIOCEN);
+	RCC->AHB2ENR |= (RCC_AHB2ENR_GPIOCEN);
 }
 
-void display_init()
+void display_init(bool dual_line, bool large_font, bool cursor_on, bool cursor_blink, bool increment_mode, bool display_shift_on)
 {
-	function_set(true, false, false);
-	HAL_Delay(400);
-	function_set(true, false, false);
-	HAL_Delay(400);
-	function_set(true, false, false);
-	HAL_Delay(400);
+	function_set(true, dual_line, large_font);
+	HAL_Delay(100);
+	function_set(true, dual_line, large_font);
+	HAL_Delay(100);
+	function_set(true, dual_line, large_font);
+	HAL_Delay(100);
+	display_on_off(true, cursor_on, cursor_blink);
+	HAL_Delay(100);
+	display_clear();
+	HAL_Delay(100);
+	entry_mode_set(increment_mode, display_shift_on);
 }
 
 // TODO: check validity
@@ -198,26 +203,14 @@ void gpio_init()
 
 int main()
 {
+	HAL_Init();
 	gpio_init();
-	// display_init();
+	display_init(true, false, true, true, true, false);
+
+	LCD_print("dshfsdlkjfhlksjdhdsfsdfF", 0);
+	// TODO: Achieve 0.7V for the contrast in some way
+
 
 	while (1) {
-		bus_write(0x30, false);
-		HAL_Delay(400);
-		bus_write(0x30, false);
-		HAL_Delay(100);
-		bus_write(0x30, false);
-		HAL_Delay(100);
-		bus_write(0x38, false);
-		HAL_Delay(100);
-		bus_write(0x10, false);
-		HAL_Delay(100);
-		bus_write(0x0C, false);
-		HAL_Delay(100);
-		bus_write(0x06, false);
-		HAL_Delay(100);
-
-		bus_write(0b00001111, false);
-		HAL_Delay(4000);
 	}
 }
