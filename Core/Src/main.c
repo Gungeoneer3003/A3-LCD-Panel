@@ -18,8 +18,6 @@ Video Link: 	https://drive.google.com/file/d/1Dyof5X0OYgxnH25cyYK-7HI8WRTvMrMC/v
 #include <stdint.h>
 #include <string.h> // For strlen();
 
-
-
 #define DDRAM_ADDRESS_SECOND_LINE 0x40
 #define DDRAM_ADDRESS_FIRST_LINE 0x0
 /* ----------------------------------------------------- */
@@ -40,7 +38,6 @@ Video Link: 	https://drive.google.com/file/d/1Dyof5X0OYgxnH25cyYK-7HI8WRTvMrMC/v
 #define INSTRUCTION_CURSOR_SHIFT_Msk (1 << INSTRUCTION_CURSOR_SHIFT_Pos)
 #define INSTRUCTION_FUNCTION_SET_Msk (1 << INSTRUCTION_FUNCTION_SET_Pos)
 #define INSTRUCTION_DDRAM_ADDRESS_SET_Msk (1 << INSTRUCTION_DDRAM_ADDRESS_SET_Pos)
-
 
 #define DISPLAY_DELAY 3000
 
@@ -154,13 +151,15 @@ void function_set(bool byte_mode, bool dual_line, bool font)
 	instruction_send(mask);
 }
 
-void ddram_address_set(uint8_t addr) {
+void ddram_address_set(uint8_t addr)
+{
 	uint8_t mask = INSTRUCTION_DDRAM_ADDRESS_SET_Msk | addr;
 
 	instruction_send(mask);
 }
 
-void line_set(bool second_line) {
+void line_set(bool second_line)
+{
 	if (second_line)
 		ddram_address_set(DDRAM_ADDRESS_SECOND_LINE);
 	else
@@ -173,10 +172,7 @@ void LCD_write_char(uint8_t letter)
 	data_send(letter);
 }
 
-enum Line {
-	FIRST,
-	SECOND
-};
+enum Line { FIRST, SECOND };
 
 void LCD_print(const char *message, enum Line line)
 {
@@ -186,10 +182,10 @@ void LCD_print(const char *message, enum Line line)
 	}
 
 	if (line == FIRST)
-	 	line_set(false);
+		line_set(false);
 	else
 		line_set(true);
-	
+
 	for (int i = 0; i < length; i++) {
 		LCD_write_char(message[i]);
 	}
@@ -202,7 +198,8 @@ void bus_init()
 	RCC->AHB2ENR |= (RCC_AHB2ENR_GPIOCEN);
 }
 
-void display_init(bool dual_line, bool large_font, bool cursor_on, bool cursor_blink, bool increment_mode, bool display_shift_on)
+void display_init(bool dual_line, bool large_font, bool cursor_on, bool cursor_blink, bool increment_mode,
+		  bool display_shift_on)
 {
 	function_set(true, dual_line, large_font);
 	HAL_Delay(100);
@@ -255,5 +252,4 @@ int main()
 		HAL_Delay(2000);
 		display_clear();
 	}
-
 }
